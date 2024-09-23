@@ -6,7 +6,7 @@ pipeline {
         }
     }
     parameters{
-        choice(name: 'action', choices: ['select', 'apply', 'destroy'], description: 'Terraform action')
+        choice(name: 'action', choices: ['select', 'apply', 'validate', 'destroy'], description: 'Terraform action')
     }
     environment {
         AWS_ACCESS_KEY_ID = credentials('aws-access-key')
@@ -18,6 +18,16 @@ pipeline {
             steps {
                 sh 'terraform --version'
                 sh 'terraform init'
+            }
+        }
+        stage('validate') {
+            when {
+                expression {
+                    return params.action == 'validate'
+                }
+            }
+            steps {
+                sh 'terraform validate'
             }
         }
         stage('apply') {
